@@ -1,3 +1,5 @@
+// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,32 +9,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id        String          @id @default(cuid())
   name      String
   email     String          @unique
-  password  String          // we'll store hashed password
+  password  String
+
   messages  Message[]
   members   ChannelMember[]
+
   createdAt DateTime        @default(now())
+  lastseen  DateTime?       // presence tracking
 }
 
 model Channel {
   id        String          @id @default(cuid())
-  name      String
-  members   ChannelMember[]
-  messages  Message[]
+  name      String          @unique
   createdAt DateTime        @default(now())
+
+  messages  Message[]
+  members   ChannelMember[]
 }
 
 model ChannelMember {
   id        String   @id @default(cuid())
+
   userId    String
   channelId String
-  user      User     @relation(fields: [userId], references: [id])
-  channel   Channel  @relation(fields: [channelId], references: [id])
   joinedAt  DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
 
   @@unique([userId, channelId])
 }
@@ -41,8 +48,10 @@ model Message {
   id        String   @id @default(cuid())
   text      String
   createdAt DateTime @default(now())
+
   userId    String
   channelId String
-  user      User     @relation(fields: [userId], references: [id])
-  channel   Channel  @relation(fields: [channelId], references: [id])
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
 }

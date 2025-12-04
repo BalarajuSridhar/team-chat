@@ -1,7 +1,5 @@
-// prisma/schema.prisma
-
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl"]
 }
 
@@ -15,32 +13,27 @@ model User {
   name      String
   email     String          @unique
   password  String
-
-  messages  Message[]
-  members   ChannelMember[]
-
   createdAt DateTime        @default(now())
-  lastseen  DateTime?       // presence tracking
+  lastseen  DateTime?
+  members   ChannelMember[]
+  messages  Message[]
 }
 
 model Channel {
   id        String          @id @default(cuid())
   name      String          @unique
   createdAt DateTime        @default(now())
-
-  messages  Message[]
   members   ChannelMember[]
+  messages  Message[]
 }
 
 model ChannelMember {
   id        String   @id @default(cuid())
-
   userId    String
   channelId String
   joinedAt  DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, channelId])
 }
@@ -49,10 +42,8 @@ model Message {
   id        String   @id @default(cuid())
   text      String
   createdAt DateTime @default(now())
-
   userId    String
   channelId String
-
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

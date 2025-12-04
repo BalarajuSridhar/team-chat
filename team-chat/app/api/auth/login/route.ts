@@ -1,4 +1,6 @@
 // app/api/auth/login/route.ts
+export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../lib/prisma";
 import { comparePassword, createToken } from "../../../lib/auth";
@@ -56,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     return res;
   } catch (error) {
-    console.error(error);
+    console.error("Login error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
